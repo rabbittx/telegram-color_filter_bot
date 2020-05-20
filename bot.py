@@ -21,6 +21,26 @@ def remove_image():
     except Exception as delete_error:
         print("something is wrong file not removed")
 
+
+def color_filter(pixel, color):
+    return pixel[0]+color[0], pixel[1]+color[1], pixel[2]+color[2]
+
+
+def change_pixels(image_path, red, green, blue):
+    img = Image.open(image_path)
+    pixels = img.load()
+    for i in range(img.size[0]):
+        for j in range(img.size[1]):
+            # try to filter them better by find more rgb color
+            if pixels[i, j] > (230, 230, 230):
+                continue
+            else:
+                # (-150, -60, 160)
+                pixels[i, j] = color_filter(pixels[i, j], (red, green, blue))
+    return img
+
+""" ************************************** Black-White start here !***************************************"""
+
 def get_black_white(bot, update):
     chat_id = update.message.chat_id
     bot.send_message(chat_id=chat_id, text="send me your image !")
@@ -42,21 +62,55 @@ def black_white_filter(bot, update):
         bot.send_message(chat_id=chat_id, text=f"something is wrong try one more time {get_image_error}")
 
 
+""" ************************************** Black-White end here !***************************************"""
+
+""" ************************************** blue start here !***************************************"""
+
+
+def get_blue(bot, update):
+    chat_id = update.message.chat_id
+    bot.send_message(chat_id=chat_id, text="send me your image !")
+    return "blue"
+
+
+def blue_filter(bot, update):
+    try:
+        chat_id = update.message.chat_id
+        file = bot.getFile(update.message.photo[-1].file_id)
+        file.download('originalBluePic.jpg')
+        # -150,-60,160
+        img = change_pixels('originalBluePic.jpg', -150, -80, 130)
+        img.save("blueImage.jpg")
+        bot.send_message(chat_id=chat_id, text="blue filter is add to your image")
+        bot.send_photo(chat_id=chat_id, photo=open('blueImage.jpg', 'rb'))
+        remove_image()
+    except Exception as get_image_error:
+        chat_id = update.message.chat_id
+        bot.send_message(chat_id=chat_id, text=f"something is wrong try one more time {get_image_error}")
+
+
+""" *************************************** blue is end here***************************************"""
+
 def main():
-    updater = Updater('token is here ! ')
+    updater = Updater('token is here !')
     db = updater.dispatcher
     conversation_handler = ConversationHandler(
         entry_points=[
             CommandHandler("black_white", get_black_white),
+            CommandHandler("blue", get_blue),
 
         ],
 
         states={
             "black_white": [MessageHandler(Filters.photo, black_white_filter)],
+            "blue": [MessageHandler(Filters.photo, blue_filter)],
         },
         fallbacks=[
             MessageHandler(Filters.photo, black_white_filter),
             CommandHandler("black_white", get_black_white),
+            MessageHandler(Filters.photo, blue_filter),
+            CommandHandler("blue", get_blue),
+
         ],
         allow_reentry=True,
         per_user=True,
