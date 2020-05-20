@@ -91,6 +91,34 @@ def blue_filter(bot, update):
 
 """ *************************************** blue is end here***************************************"""
 
+
+""" ***************************************red is start here***************************************"""
+
+
+def get_red(bot, update):
+    chat_id = update.message.chat_id
+    bot.send_message(chat_id=chat_id, text="send me your image !")
+    return "red"
+
+
+def red_filter(bot, update):
+    try:
+        chat_id = update.message.chat_id
+        file = bot.getFile(update.message.photo[-1].file_id)
+        file.download('originalRedPic.jpg')
+        # 75,-90,-110
+        img = change_pixels('originalRedPic.jpg', 130, -90, -90)
+        img.save("redImage.jpg")
+        bot.send_message(chat_id=chat_id, text="red filter is add")
+        bot.send_photo(chat_id=chat_id, photo=open('redImage.jpg', 'rb'))
+        remove_image()
+    except Exception as get_image_error:
+        chat_id = update.message.chat_id
+        bot.send_message(chat_id=chat_id, text=f"something is wrong try one more time {get_image_error}")
+
+
+""" ***************************************red is end ***************************************"""
+
 def main():
     updater = Updater('token is here !')
     db = updater.dispatcher
@@ -98,18 +126,22 @@ def main():
         entry_points=[
             CommandHandler("black_white", get_black_white),
             CommandHandler("blue", get_blue),
+            CommandHandler("red", get_red),
 
         ],
 
         states={
             "black_white": [MessageHandler(Filters.photo, black_white_filter)],
             "blue": [MessageHandler(Filters.photo, blue_filter)],
+            "red": [MessageHandler(Filters.photo, red_filter)],
         },
         fallbacks=[
             MessageHandler(Filters.photo, black_white_filter),
             CommandHandler("black_white", get_black_white),
             MessageHandler(Filters.photo, blue_filter),
             CommandHandler("blue", get_blue),
+            MessageHandler(Filters.photo, red_filter),
+            CommandHandler("red", get_red),
 
         ],
         allow_reentry=True,
