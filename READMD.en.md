@@ -1,3 +1,5 @@
+[read in persian](README.fa.md)
+
 # Telegram Color Filter Bot
 
 The Telegram Color Filter Bot is a bot that allows you to apply various color filters to your images. This bot can convert your images to black and white, add color filters like blue or red, and even create a red and blue 3D effect.
