@@ -1,4 +1,4 @@
-[read in english](readme.en.md)
+[read in english](README.en.md)
 <div dir='ltr'>
 # ربات تلگرام فیلتر رنگی
 
